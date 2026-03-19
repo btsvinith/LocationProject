@@ -1,0 +1,25 @@
+CREATE TABLE Country(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    CountryName VARCHAR(100) NOT NULL,
+    CreatedDateTime DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    ModifiedDateTime DATETIME2 NULL,
+	RequiresStateDistrict bit NOT NULL,
+);
+
+CREATE TABLE State(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    StateName VARCHAR(100) NOT NULL,
+    CountryId INT,
+    CreatedDateTime DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    ModifiedDateTime DATETIME2 NULL,
+    FOREIGN KEY (CountryId) REFERENCES Country(Id)
+);
+
+CREATE TABLE District(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    DistrictName VARCHAR(100) NOT NULL,
+    StateId INT,
+    CreatedDateTime DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    ModifiedDateTime DATETIME2 NULL,
+    FOREIGN KEY (StateId) REFERENCES State(Id)
+);

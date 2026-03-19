@@ -1,0 +1,316 @@
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+}
+
+<div class="container mt-4">
+    <h3>Location Management</h3>
+
+    <div id="dynamic-countries">
+        <div class="row country-row mb-2" data-index="0">
+            <div class="col-md-4">
+                <select class="form-select country-dropdown" data-index="0">
+                    <option value="">Select Country</option>
+                    @foreach(var c in ViewBag.Countries as IEnumerable<myFirstProject.Models.Country>)
+                    {
+                        <option value="@c.Id" data-requires="@(c.RequiresStateDistrict ? 1 : 0)">@c.CountryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select state-dropdown d-none" data-index="0">
+                    <option value="">Select State</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select district-dropdown d-none" data-index="0">
+                    <option value="">Select District</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <button id="add-country" class="btn btn-secondary">Add Country</button>
+        <button id="clear" class="btn btn-warning">Clear</button>
+        <button id="save" class="btn btn-primary">Save</button>
+    </div>
+
+    <hr />
+
+    <div>
+        <table class="table table-bordered" id="locations-grid">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Country</th>
+                    <th>State</th>
+                    <th>District</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <nav>
+            <ul id="pagination" class="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function(){
+            var currentPage = 1;
+            var pageSize = 5;
+
+            function renderPagination(total){
+                var totalPages = Math.max(1, Math.ceil(total / pageSize));
+                var ul = $('#pagination').empty();
+                for(var i=1;i<=totalPages;i++){
+                    var li = $('<li class="page-item">');
+                    if(i === currentPage) li.addClass('active');
+                    var a = $('<a class="page-link" href="#">').text(i).data('page', i);
+                    li.append(a);
+                    ul.append(li);
+                }
+            }
+
+            var urls = {
+                getPaged: '@Url.Action("GetPaged","Location")',
+                getStates: '@Url.Action("GetStates","Location")',
+                getDistrictsByCountry: '@Url.Action("GetDistrictsByCountry","Location")',
+                save: '@Url.Action("Save","Location")',
+                delete: '@Url.Action("Delete","Location")',
+                getById: '@Url.Action("GetById","Location")'
+            };
+
+            function parseRequires(raw){
+                if (raw === undefined || raw === null) return 1;
+                var t = typeof raw;
+                if (t === 'number') return raw;
+                if (t === 'boolean') return raw ? 1 : 0;
+                var n = parseInt(raw);
+                if (!isNaN(n)) return n;
+                var lr = (''+raw).toLowerCase();
+                if (lr === 'true') return 1;
+                if (lr === 'false') return 0;
+                return 1;
+            }
+
+            function loadGrid(page){
+                page = page || 1;
+                currentPage = page;
+                $.get(urls.getPaged, { page: page, pageSize: pageSize })
+                    .done(function(resp){
+                        var items = resp.items || [];
+                        var total = resp.total || 0;
+                        var tb = $('#locations-grid tbody').empty();
+                        $.each(items, function(i, row){
+                            var idVal = row.districtId || row.id || '';
+                            var tr = $('<tr>');
+                            tr.append($('<td>').text(idVal));
+                            tr.append($('<td>').text(row.countryName));
+                            tr.append($('<td>').text(row.stateName));
+                            tr.append($('<td>').text(row.districtName));
+                            tr.append($('<td>').html('<button class="btn btn-sm btn-primary edit" data-id="'+idVal+'">Edit</button> <button class="btn btn-sm btn-danger delete" data-id="'+idVal+'">Delete</button>'));
+                            tb.append(tr);
+                        });
+                        renderPagination(total);
+                    })
+                    .fail(function(xhr){
+                        console.error('GetPaged failed', xhr);
+                        alert('Failed to load data: ' + (xhr.responseJSON?.error || xhr.statusText));
+                    });
+            }
+
+            loadGrid(1);
+
+            function bindCountryChange(container){
+                container.find('.country-dropdown').off('change').on('change', function(){
+                    var idx = $(this).data('index');
+                    var countryId = $(this).val();
+                    var requires = parseRequires($(this).find('option:selected').data('requires'));
+                    var stateDrop = container.find('.state-dropdown[data-index="'+idx+'"]');
+                    var districtDrop = container.find('.district-dropdown[data-index="'+idx+'"]');
+                    if(!countryId){
+                        stateDrop.addClass('d-none').empty().append('<option value="">Select State</option>');
+                        districtDrop.addClass('d-none').empty().append('<option value="">Select District</option>');
+                        return;
+                    }
+
+                    $.get(urls.getStates, { countryId: countryId })
+                        .done(function(states){
+                            stateDrop.removeClass('d-none').empty().append('<option value="">Select State</option>');
+                            var filteredStates = (states || []).filter(function(s){ return s && s.stateName && s.stateName.toString().trim() !== ''; });
+                            $.each(filteredStates, function(i, s){ stateDrop.append('<option value="'+s.id+'">'+s.stateName+'</option>'); });
+                        })
+                        .fail(function(xhr){ console.error('GetStates failed', xhr); alert('Failed to load states'); });
+
+                    $.get(urls.getDistrictsByCountry, { countryId: countryId })
+                        .done(function(districts){
+                    stateDrop.removeClass('d-none').empty().append('<option value="">Select State</option>');
+                    districtDrop.removeClass('d-none').empty().append('<option value="">Select District</option>');
+                    var filteredDistricts = (districts || []).filter(function(d){ return d && d.districtName && d.districtName.toString().trim() !== ''; });
+                    districtDrop.data('all', filteredDistricts);
+                    $.each(filteredDistricts, function(i, d){ districtDrop.append('<option value="'+d.id+'" data-state="'+(d.stateId||'')+'">'+d.districtName+'</option>'); });
+                        })
+                        .fail(function(xhr){ console.error('GetDistrictsByCountry failed', xhr); alert('Failed to load districts'); });
+                });
+
+                container.find('.state-dropdown').off('change').on('change', function(){
+                    var idx = $(this).data('index');
+                    var stateId = $(this).val();
+                    var districtDrop = container.find('.district-dropdown[data-index="'+idx+'"]');
+                    if(!stateId){ 
+                    var all = districtDrop.data('all') || [];
+                    var filtered = all.filter(function(d){ return d && d.districtName && d.districtName.toString().trim() !== ''; });
+                    districtDrop.removeClass('d-none').empty().append('<option value="">Select District</option>');
+                    $.each(filtered, function(i, d){ districtDrop.append('<option value="'+d.id+'" data-state="'+(d.stateId||'')+'">'+d.districtName+'</option>'); });
+                        return; 
+                    }
+
+                    var all = districtDrop.data('all') || [];
+                    var filtered = all.filter(function(x){ return x.stateId == stateId && x.districtName && x.districtName.toString().trim() !== ''; });
+                    districtDrop.removeClass('d-none').empty().append('<option value="">Select District</option>');
+                    $.each(filtered, function(i, d){ districtDrop.append('<option value="'+d.id+'" data-state="'+(d.stateId||'')+'">'+d.districtName+'</option>'); });
+                });
+
+                container.find('.district-dropdown').off('change').on('change', function(){
+                    var idx = $(this).data('index');
+                    var selectedDistrictId = $(this).val();
+                    if(!selectedDistrictId) return;
+                    var selectedOpt = $(this).find('option:selected');
+                    var stateId = selectedOpt.data('state') || selectedOpt.attr('data-state');
+                    var stateDrop = container.find('.state-dropdown[data-index="'+idx+'"]');
+                    var countryOpt = container.find('.country-dropdown[data-index="'+idx+'"] option:selected');
+                    var requires = parseRequires(countryOpt.data('requires'));
+                    if(requires === 0) return;
+                    if(stateId && stateDrop.length){
+                        stateDrop.removeClass('d-none').val(stateId).trigger('change');
+                        var self = $(this);
+                        setTimeout(function(){ self.val(selectedDistrictId); }, 250);
+                    }
+                });
+            }
+
+            bindCountryChange($('#dynamic-countries'));
+
+            $('#add-country').click(function(e){
+                e.preventDefault();
+                var index = $('#dynamic-countries .country-row').length;
+                var tpl = $('#dynamic-countries .country-row').first().clone();
+                tpl.attr('data-index', index);
+                tpl.find('[data-index]').each(function(){ $(this).attr('data-index', index); });
+                tpl.find('select').val('');
+                tpl.find('.state-dropdown, .district-dropdown').addClass('d-none').empty().append('<option value="">Select</option>');
+                $('#dynamic-countries').append(tpl);
+                bindCountryChange($('#dynamic-countries'));
+            });
+
+            $('#clear').click(function(){
+                $('#dynamic-countries').html($('#dynamic-countries .country-row').first().prop('outerHTML'));
+                var first = $('#dynamic-countries .country-row').first();
+                first.find('select').val('');
+                first.find('.state-dropdown, .district-dropdown').addClass('d-none').empty().append('<option value="">Select</option>');
+                bindCountryChange($('#dynamic-countries'));
+            });
+
+            $('#save').click(function(){
+                var row = $('#dynamic-countries .country-row').first();
+                var editId = row.data('edit-id') || null;
+                var countryId = parseInt(row.find('.country-dropdown').val() || 0);
+                var stateId = parseInt(row.find('.state-dropdown').val() || 0);
+                var districtId = parseInt(row.find('.district-dropdown').val() || 0);
+                var countryName = row.find('.country-dropdown option:selected').text();
+                var stateName = row.find('.state-dropdown option:selected').text();
+                var districtName = row.find('.district-dropdown option:selected').text();
+                if(!countryId){ alert('Please select Country'); return; }
+                var countryIdVal = countryId || null;
+                var stateIdVal = (stateId && stateId > 0) ? stateId : null;
+                var districtIdVal = (districtId && districtId > 0) ? districtId : null;
+                var stateNameVal = stateIdVal ? stateName : '';
+                var districtNameVal = districtIdVal ? districtName : '';
+
+                var dto = {
+                    id: editId,
+                    countryId: countryIdVal,
+                    countryName: countryName || '',
+                    stateId: stateIdVal,
+                    stateName: stateNameVal,
+                    districtId: districtIdVal,
+                    districtName: districtNameVal
+                };
+
+                var allDtos = [];
+                var validationError = null;
+                $('#dynamic-countries .country-row').each(function(index){
+                    var r = $(this);
+                    var eId = r.data('edit-id') || null;
+                    var cIdRaw = r.find('.country-dropdown').val();
+                    var cId = cIdRaw ? parseInt(cIdRaw) : null;
+                    if(!cId) return;
+                    var sIdRaw = r.find('.state-dropdown').val();
+                    var sId = sIdRaw ? parseInt(sIdRaw) : null;
+                    var dIdRaw = r.find('.district-dropdown').val();
+                    var dId = dIdRaw ? parseInt(dIdRaw) : null;
+                    var cName = r.find('.country-dropdown option:selected').text() || '';
+                    var sName = sId ? r.find('.state-dropdown option:selected').text() : '';
+                    var dName = dId ? r.find('.district-dropdown option:selected').text() : '';
+
+                    var requires = parseRequires(r.find('.country-dropdown option:selected').data('requires'));
+                    if(requires !== 0)
+                    {
+                        if(!sId || !dId)
+                        {
+                            validationError = 'State and District are required for selected countries.';
+                            return false;
+                        }
+                    }
+
+                    allDtos.push({ id: eId, countryId: cId, countryName: cName, stateId: sId, stateName: sName, districtId: dId, districtName: dName });
+                });
+
+                if(validationError){ alert(validationError); return; }
+                if(allDtos.length === 0){ alert('Please add at least one Country'); return; }
+
+                $.ajax({ url: urls.save, method: 'POST', contentType: 'application/json', data: JSON.stringify(allDtos) })
+                    .done(function(resp){ loadGrid(); alert('Saved Successfully'); $('#clear').click(); })
+                    .fail(function(xhr){
+                        var msg = xhr.responseJSON?.message || xhr.responseJSON?.error || xhr.statusText;
+                        alert('Save failed: ' + msg);
+                    });
+            });
+
+            $('#locations-grid').on('click', '.edit', function(){
+                var id = $(this).data('id');
+                $.get(urls.getById, { id: id })
+                    .done(function(data){
+                    if(!data) return;
+                    $('#clear').click();
+                    var row = $('#dynamic-countries .country-row').first();
+                    row.find('.country-dropdown').val(data.countryId).trigger('change');
+                    setTimeout(function(){
+                        row.find('.state-dropdown').val(data.stateId).trigger('change');
+                        setTimeout(function(){ row.find('.district-dropdown').val(data.districtId); }, 300);
+                    }, 300);
+                    row.data('edit-id', data.districtId || data.id);
+                    })
+                    .fail(function(xhr){ alert('Failed to load record: ' + (xhr.responseJSON?.error || xhr.statusText)); });
+            });
+
+            $('#locations-grid').on('click', '.delete', function(){
+                if(!confirm('Delete?')) return;
+                var id = $(this).data('id');
+                $.ajax({ url: urls.delete, method: 'POST', contentType: 'application/json', data: JSON.stringify(id) })
+                    .done(function(){ loadGrid(); alert('Deleted Successfully'); })
+                    .fail(function(xhr){ alert('Delete failed: ' + (xhr.responseJSON?.error || xhr.statusText)); });
+            });
+
+            $('#pagination').on('click', 'a.page-link', function(e){
+                e.preventDefault();
+                var p = $(this).data('page');
+                if(p) loadGrid(p);
+            });
+        });
+    </script>
+}

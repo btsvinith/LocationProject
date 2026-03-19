@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "dgSpecHash": "Yxh3VaoQgOE=",
+  "success": true,
+  "projectFilePath": "C:\\Vinith\\.Net\\Projects\\LocationProject\\myFirstProject\\myFirstProject\\myFirstProject.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rudhr\\.nuget\\packages\\azure.core\\1.44.1\\azure.core.1.44.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\azure.identity\\1.13.2\\azure.identity.1.13.2.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\dapper\\2.1.1\\dapper.2.1.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.bcl.cryptography\\9.0.4\\microsoft.bcl.cryptography.9.0.4.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.data.sqlclient\\6.1.0\\microsoft.data.sqlclient.6.1.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\6.0.2\\microsoft.data.sqlclient.sni.runtime.6.0.2.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.extensions.dependencymodel\\7.0.0\\microsoft.extensions.dependencymodel.7.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identity.client\\4.67.2\\microsoft.identity.client.4.67.2.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.67.2\\microsoft.identity.client.extensions.msal.4.67.2.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.7.1\\microsoft.identitymodel.abstractions.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\7.7.1\\microsoft.identitymodel.jsonwebtokens.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.logging\\7.7.1\\microsoft.identitymodel.logging.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.protocols\\7.7.1\\microsoft.identitymodel.protocols.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\7.7.1\\microsoft.identitymodel.protocols.openidconnect.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.identitymodel.tokens\\7.7.1\\microsoft.identitymodel.tokens.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog\\2.12.0\\serilog.2.12.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.aspnetcore\\7.0.0\\serilog.aspnetcore.7.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.extensions.hosting\\7.0.0\\serilog.extensions.hosting.7.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.extensions.logging\\7.0.0\\serilog.extensions.logging.7.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.formatting.compact\\1.1.0\\serilog.formatting.compact.1.1.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.settings.configuration\\7.0.0\\serilog.settings.configuration.7.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.sinks.console\\4.1.0\\serilog.sinks.console.4.1.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.sinks.debug\\2.0.0\\serilog.sinks.debug.2.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\serilog.sinks.file\\5.0.0\\serilog.sinks.file.5.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.clientmodel\\1.1.0\\system.clientmodel.1.1.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.configuration.configurationmanager\\9.0.4\\system.configuration.configurationmanager.9.0.4.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.identitymodel.tokens.jwt\\7.7.1\\system.identitymodel.tokens.jwt.7.7.1.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.memory.data\\6.0.0\\system.memory.data.6.0.0.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.4\\system.security.cryptography.pkcs.9.0.4.nupkg.sha512",
+    "C:\\Users\\rudhr\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "myFirstProject depends on Dapper (>= 2.1.0) but Dapper 2.1.0 was not found. Dapper 2.1.1 was resolved instead.",
+      "projectPath": "C:\\Vinith\\.Net\\Projects\\LocationProject\\myFirstProject\\myFirstProject\\myFirstProject.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Vinith\\.Net\\Projects\\LocationProject\\myFirstProject\\myFirstProject\\myFirstProject.csproj",
+      "libraryId": "Dapper",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
